@@ -1,13 +1,22 @@
-BIZAI TZ — MVP Prototype
-Fungua index.html kwenye browser ya simu/kompyuta.
+BIZAI TZ — Backend Starter
 
-Hii ni prototype ya frontend. Inaonyesha:
-- Home
-- Token balance
-- Caption generator
-- Advertisement generator
-- Poster idea generator
-- Video script generator
-- Token packages
+Hii ni hatua ya pili ya prototype. Ina:
+- Register ya demo
+- Wallet ya tokeni
+- Token costs
+- AI generation endpoint
+- Database schema ya production
 
-Ili iwe app ya biashara yenye AI halisi na malipo halisi, hatua inayofuata ni kuunganisha backend, AI API, database, authentication na payment gateway.
+KUANZA:
+1. Install Node.js.
+2. Fungua folder hili kwenye computer/hosting.
+3. Run: npm install
+4. Copy .env.example kuwa .env
+5. Weka OPENAI_API_KEY yako kwenye .env
+6. Run: npm start
+
+TAHADHARI:
+- server.js inatumia Map kama demo; si database ya production.
+- Usichapishe API key kwenye frontend.
+- Kabla ya live, badilisha demo Map kwenda database na ongeza authentication halisi.
+- Malipo bado hayajaunganishwa; tutaongeza payment webhook baada ya kuchagua provider.
