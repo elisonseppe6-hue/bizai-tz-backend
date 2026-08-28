@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="sw">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BIZAI TZ</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f5f7fb;color:#18202a}
+.app{max-width:480px;margin:auto;min-height:100vh;background:#fff}
+header{padding:24px 20px;background:#111827;color:#fff;border-radius:0 0 24px 24px}
+.logo{font-size:28px;font-weight:800}.tag{opacity:.8;margin-top:6px}
+.balance{margin-top:18px;background:#fff;color:#111827;padding:16px;border-radius:16px;display:flex;justify-content:space-between;align-items:center}
+.balance b{font-size:24px}
+main{padding:20px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{border:1px solid #e5e7eb;border-radius:16px;padding:18px;background:#fff;cursor:pointer}
+.icon{font-size:28px}.card h3{margin:10px 0 5px;font-size:16px}.card p{margin:0;color:#667085;font-size:13px}
+button{width:100%;border:0;border-radius:12px;padding:14px;font-weight:700;font-size:15px;cursor:pointer}
+.primary{background:#111827;color:#fff}.buy{background:#16a34a;color:#fff}
+section{margin-top:24px}label{display:block;font-weight:700;margin:12px 0 7px}
+input,textarea,select{width:100%;padding:13px;border:1px solid #d0d5dd;border-radius:10px;font-size:15px}
+textarea{min-height:110px}.result{margin-top:14px;background:#f3f4f6;padding:16px;border-radius:12px;white-space:pre-wrap;line-height:1.5}
+.packages{display:grid;gap:10px}.pkg{padding:15px;border:1px solid #ddd;border-radius:12px;display:flex;justify-content:space-between;align-items:center}
+nav{position:sticky;bottom:0;background:#fff;border-top:1px solid #eee;padding:12px 20px;display:flex;justify-content:space-around}
+nav button{background:none;color:#475467;width:auto;padding:8px}
+.hidden{display:none}.small{font-size:12px;color:#667085}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="logo">BIZAI TZ</div>
+  <div class="tag">Msaidizi wako wa biashara kwa Kiswahili</div>
+  <div class="balance"><span>Tokeni zako</span><b id="tokens">30</b></div>
+</header>
+
+<main id="home">
+<section>
+<h2>Unataka kufanya nini?</h2>
+<div class="grid">
+<div class="card" onclick="openTool('caption')"><div class="icon">✍️</div><h3>Caption</h3><p>Andika caption ya biashara</p></div>
+<div class="card" onclick="openTool('ad')"><div class="icon">📢</div><h3>Tangazo</h3><p>Tengeneza tangazo la kuuza</p></div>
+<div class="card" onclick="openTool('poster')"><div class="icon">🖼️</div><h3>Poster</h3><p>Idea ya poster ya biashara</p></div>
+<div class="card" onclick="openTool('script')"><div class="icon">🎬</div><h3>Script</h3><p>Script ya video fupi</p></div>
+</div>
+</section>
+<section>
+<button class="buy" onclick="showBuy()">➕ Nunua Tokeni</button>
+</section>
+<section>
+<h3>Jinsi inavyofanya kazi</h3>
+<p class="small">Chagua huduma → ingiza taarifa za biashara → tumia tokeni → pata content tayari kutumia.</p>
+</section>
+</main>
+
+<main id="tool" class="hidden">
+<button onclick="goHome()">← Rudi</button>
+<h2 id="toolTitle">AI Generator</h2>
+<label>Jina la biashara</label><input id="biz" placeholder="Mfano: Elison Salon">
+<label>Huduma/Bidhaa</label><input id="product" placeholder="Mfano: Braids">
+<label>Bei (hiari)</label><input id="price" placeholder="Mfano: TSh 20,000">
+<label>Maelekezo</label><textarea id="details" placeholder="Mfano: Nataka wateja wapya wa wiki hii"></textarea>
+<button class="primary" style="margin-top:12px" onclick="generate()">✨ Tengeneza</button>
+<div id="result" class="result hidden"></div>
+</main>
+
+<main id="buy" class="hidden">
+<button onclick="goHome()">← Rudi</button><h2>Nunua Tokeni</h2>
+<div class="packages">
+<div class="pkg"><span><b>Starter</b><br>10 Tokens</span><b>TSh 2,000</b></div>
+<div class="pkg"><span><b>Business</b><br>30 Tokens</span><b>TSh 5,000</b></div>
+<div class="pkg"><span><b>Pro</b><br>100 Tokens</span><b>TSh 12,000</b></div>
+</div>
+<p class="small" style="margin-top:15px">Prototype: malipo halisi yataunganishwa kwenye hatua ya backend.</p>
+</main>
+
+<nav><button onclick="goHome()">🏠 Home</button><button onclick="showBuy()">💰 Tokeni</button></nav>
+</div>
+<script>
+let tool='', tokens=30;
+const costs={caption:1,ad:2,poster:3,script:3};
+const titles={caption:'✍️ AI Caption Generator',ad:'📢 AI Tangazo Generator',poster:'🖼️ AI Poster Generator',script:'🎬 AI Script Generator'};
+function openTool(t){tool=t;home.classList.add('hidden');buy.classList.add('hidden');toolEl.classList.remove('hidden');toolTitle.textContent=titles[t];result.classList.add('hidden')}
+function goHome(){toolEl.classList.add('hidden');buy.classList.add('hidden');home.classList.remove('hidden')}
+function showBuy(){home.classList.add('hidden');toolEl.classList.add('hidden');buy.classList.remove('hidden')}
+function generate(){
+ if(tokens<costs[tool]){alert('Tokeni hazitoshi. Nunua tokeni zaidi.');return}
+ let b=biz.value||'Biashara yako', p=product.value||'huduma yako', pr=price.value||'', d=details.value||'';
+ tokens-=costs[tool]; document.getElementById('tokens').textContent=tokens;
+ let out='';
+ if(tool==='caption') out=`🔥 ${b} — ${p} ${pr?'kwa '+pr:''}!\n\n${d||'Huduma bora, bei nzuri na huduma ya kuaminika.'}\n\n📲 Wasiliana nasi leo na uagize sasa!\n#Biashara #Tanzania #${p.replace(/\s+/g,'')}`;
+ if(tool==='ad') out=`📢 TANGAZO LA BIASHARA\n\n${b}\n\nTunatoa: ${p}\n${pr?'Bei: '+pr:''}\n\n${d||'Usikose nafasi hii! Wasiliana nasi leo.'}\n\n📲 ORDER NOW`;
+ if(tool==='poster') out=`🖼️ IDEA YA POSTER\n\nKichwa: "${p.toUpperCase()} — USIKOSE!"\nBiashara: ${b}\nBei: ${pr||'Wasiliana nasi'}\nCTA: "Piga simu / WhatsApp sasa"\n\nDesign: picha kubwa ya bidhaa + bei + namba ya mawasiliano.`;
+ if(tool==='script') out=`🎬 SCRIPT YA VIDEO (30s)\n\n0–5s: Onyesha ${p} kwa close-up.\n5–15s: ${b} ikionyesha huduma/bidhaa.\n15–25s: Eleza faida kuu. ${d}\n25–30s: CTA — "Wasiliana nasi leo!"`;
+ result.textContent=out;result.classList.remove('hidden')
+}
+const home=document.getElementById('home'),toolEl=document.getElementById('tool'),buy=document.getElementById('buy');
+const toolTitle=document.getElementById('toolTitle'),result=document.getElementById('result'),biz=document.getElementById('biz'),product=document.getElementById('product'),price=document.getElementById('price'),details=document.getElementById('details');
+</script>
+</body></html>
