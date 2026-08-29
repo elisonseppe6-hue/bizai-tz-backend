@@ -20,9 +20,28 @@ create table if not exists generations (
   user_id uuid not null references profiles(id) on delete cascade,
   service text not null,
   tokens_used integer not null,
+  input_data jsonb,
   output text,
   created_at timestamptz not null default now()
 );
+
+-- RPC to change tokens for a user. This should be created using the Supabase SQL editor
+-- and called from server-side code using the service role key. It updates the user's
+-- token balance atomically and records a token_transactions row.
+create or replace function change_tokens(p_user_id uuid, p_amount integer)
+returns integer as $$
+declare
+  new_tokens integer;
+  v_type text := case when p_amount > 0 then 'purchase' else 'usage' end;
+begin
+  update profiles set tokens = tokens + p_amount where id = p_user_id returning tokens into new_tokens;
+  if not found then
+    raise exception 'profiles row not found for user %', p_user_id;
+  end if;
+  insert into token_transactions(user_id, amount, type, reference) values (p_user_id, p_amount, v_type, 'rpc:change_tokens');
+  return new_tokens;
+end;
+$$ language plpgsql security definer;
 
 -- IMPORTANT: In production, token changes should happen through
 -- server-side functions/RPC with authorization, not directly from the browser.
