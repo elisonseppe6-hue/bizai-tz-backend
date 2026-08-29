@@ -66,10 +66,30 @@ Maelekezo: ${details||"hakuna"}
 Jibu liwe tayari kutumika na mteja.`;
     const r=await openai.responses.create({model:process.env.OPENAI_MODEL||"gpt-5",input:prompt});
     const output=r.output_text;
-    const {data:newBalance,error:te}=await supabase.rpc("change_tokens",{p_user_id:user.id,p_amount:-cost});
-    if(te)return res.status(500).json({error:"Imeshindikana kukata tokeni."});
-    await supabase.from("token_transactions").insert({user_id:user.id,amount:-cost,type:"usage",description:`AI ${type}`});
+
+    // Call the server-side RPC to change tokens atomically.
+    const { data: rpcData, error: te } = await supabase.rpc("change_tokens",{p_user_id:user.id,p_amount:-cost});
+    if(te) return res.status(500).json({error:"Imeshindikana kukata tokeni."});
+
+    // Normalize different possible RPC return shapes across Supabase client versions
+    let newBalance;
+    if (Array.isArray(rpcData)) {
+      // some versions return [{ change_tokens: 27 }] or [27]
+      if (rpcData.length === 0) newBalance = null;
+      else if (typeof rpcData[0] === 'object') newBalance = rpcData[0].change_tokens ?? Object.values(rpcData[0])[0];
+      else newBalance = rpcData[0];
+    } else if (rpcData && typeof rpcData === 'object') {
+      newBalance = rpcData.change_tokens ?? Object.values(rpcData)[0];
+    } else {
+      newBalance = rpcData;
+    }
+
+    // Insert transaction using 'reference' column (matches supabase_schema.sql)
+    await supabase.from("token_transactions").insert({user_id:user.id,amount:-cost,type:"usage",reference:`AI ${type}`});
+
+    // Store generation including input_data (jsonb)
     await supabase.from("generations").insert({user_id:user.id,service:type,tokens_used:cost,input_data:{business,product,price,details},output});
+
     res.json({content:output,tokens:newBalance,cost});
   }catch(e){console.error(e);res.status(500).json({error:"AI imeshindwa kutengeneza content. Tokeni hazijakatwa."});}
 });
