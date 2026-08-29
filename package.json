@@ -1,0 +1,1 @@
+{"name":"bizai-tz-backend","version":"0.2.0","type":"module","scripts":{"start":"node server.js"},"dependencies":{"@supabase/supabase-js":"latest","cors":"latest","dotenv":"latest","express":"latest","openai":"latest"}}
